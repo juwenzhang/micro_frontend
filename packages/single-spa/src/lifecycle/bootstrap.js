@@ -1,8 +1,7 @@
-// settle appsToUnmount lifeCycle
-import { status } from "../shared"
+import { status } from "../shared";
 
 /**
- * unmount app lifecycle
+ * bootstrap app lifecycle
  * @param {{
  *  name: String, 
  *  loadApp: Function, 
@@ -14,12 +13,11 @@ import { status } from "../shared"
  *  unmount: Array|Function
  * }} app 
  */
-export function toUnmountPromise(app) {
+export function toBootstrapPromise(app) {
   return Promise.resolve().then(() => {
-    if (app.status !== status["MOUNTED"]) return app
-    
-    app.status = status["UNMOUNTING"]
-    return app.unmount(app.customProps).then(() => {
+    if (app.status !== status["NOT_BOOTSTRAPPED"]) return app
+    app.status = status["BOOTSTRAPPING"]
+    return app.bootstrap(app.customProps).then(() => {
       app.status = status["NOT_MOUNTED"]
       return app
     })

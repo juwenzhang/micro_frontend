@@ -4,6 +4,7 @@
  */
 
 import { reroute } from "../shared";
+import "../shared/intercept"
 
 export let start_app_is_execed = false 
 

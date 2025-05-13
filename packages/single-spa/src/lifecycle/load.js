@@ -8,7 +8,7 @@ import { composeFunc } from "../utils/flattenArrayToAsync"
  *  name: String, 
  *  loadApp: Function, 
  *  activeWhen: Function, 
- *  cusromProps: any, 
+ *  customProps: any, 
  *  status: String
  * }} app 
  */
@@ -17,7 +17,7 @@ export function toLoadPromise(app) {
     if (app.status !== status["NOT_LOADED"]) return app
 
     app.status = status["LOADING_SOURCE_CODE"]
-    return app.loadApp(app.cusromProps).then(current_app => {
+    return app.loadApp(app.customProps).then(current_app => {
       const {
         bootstrap,
         mount,
@@ -29,6 +29,7 @@ export function toLoadPromise(app) {
       app.bootstrap = composeFunc(bootstrap)
       app.mount = composeFunc(mount)
       app.unmount = composeFunc(unmount)
+      return app
     })
   })
 }

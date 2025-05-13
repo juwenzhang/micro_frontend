@@ -1,7 +1,10 @@
-import { getAppChanges } from "./status"
+import { getAppChanges, shouldBeActive } from "./status"
 import { toLoadPromise } from "../lifecycle/load"
 import { toUnmountPromise } from "../lifecycle/unmount"
+import { toBootstrapPromise } from "../lifecycle/bootstrap"
+import { toMountPromise } from "../lifecycle/mount"
 import { start_app_is_execed } from "../utils/start"
+import { callCaptureEventListeners } from "./intercept"
 
 /**
  * realise let app to load
@@ -11,7 +14,7 @@ import { start_app_is_execed } from "../utils/start"
 export function LoadApps(appsToLoad) {
   const loadAppPromises 
     = Promise.all(appsToLoad.map(app => toLoadPromise(app)))  // settle loadApp func
-  return loadAppPromises
+  return loadAppPromises.then(callEventListener)
   // test code 
   // register apps have three property
   // 1.bootstrap
@@ -25,17 +28,39 @@ export function LoadApps(appsToLoad) {
 /**
  * realise unmount unneed apps, start and mount need apps
  */
-export function performAppChange(appsToMount, appsToUnmount) {
+export function performAppChange(appsToLoad, appsToMount, appsToUnmount) {
   const unMountAppPromises 
     = Promise.all(appsToUnmount.map(app => toUnmountPromise(app)))
 
+  const loadPromises = Promise.all(appsToLoad.map(
+    app => toLoadPromise(app).then(app => {
+    return tryBootstrapAndMount(app, unMountAppPromises)
+  })))  
+
+  const mountPromises = Promise.all(appsToMount.map(
+    app => tryBootstrapAndMount(app, unMountAppPromises)))  
   
+  return Promise.all([loadPromises, mountPromises]).then(() => {
+    callEventListener()
+  })
+}
+
+function callEventListener(_event) {
+  callCaptureEventListeners(_event)
+}
+
+export function tryBootstrapAndMount(app, unMountAppPromises) {
+  if (shouldBeActive(app)) {
+    return toBootstrapPromise(app)
+      .then(app => unMountAppPromises
+        .then(() => toMountPromise(app)))
+  }
 }
 
 /**
  * when register a new application, then methods must be exec
  */
-export function reroute() {
+export function reroute(event) {
   const { 
     appsToLoad, 
     appsToMount, 
@@ -44,6 +69,6 @@ export function reroute() {
   // console.log(appsToLoad, appsToMount, appsToUnmount);
 
   return start_app_is_execed 
-    ? performAppChange(appsToMount, appsToUnmount)
+    ? performAppChange(appsToLoad, appsToMount, appsToUnmount)
     : LoadApps(appsToLoad)
 }
