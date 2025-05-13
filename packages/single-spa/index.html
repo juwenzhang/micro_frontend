@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <script type="module">
+    // 实现我们的微前端的话，最主要的就是加载不用的应用即可
+    // 该方式可以是基于路由的实现方式，也可以是基于菜单的实现方式
+    // 接入协议的实现： 
+    /** 
+     * 1.bootstrap 协议，应用被引入的时候的协议 Array | Function
+     * 2.mount 协议，应用被挂载的时候的协议  Array | Function | Promis | null | Undefined | Error
+     * 3.unmount 协议，应用被卸载的时候的协议 Array | Function | Promis | null | Undefined | Error
+     */
+     // 1. 定义不同的接口协议
+    let app1 = {
+      bootstrap: [
+        async () => console.log("app1 bootstrap1"),
+        async () => console.log("app1 bootstrap2"),
+      ],
+      mount: async () => {
+        console.log("app1 mount1")
+      },
+      unmount: async () => {
+        console.log("app1 unmount1")
+      } 
+    }
+
+    let app2 = {
+      bootstrap: [
+        async () => console.log("app2 bootstrap1"),
+        async () => console.log("app2 bootstrap2"),
+      ],
+      mount: async () => {
+        console.log("app2 mount1")
+      },
+      unmount: async () => {
+        console.log("app2 unmount1")
+      } 
+    }
+
+    // 实现注册应用和开始应用方法的阴图
+    import { registerApplication, startApp } from "./src/index.js"
+    // 开始注册应用
+    registerApplication(
+      // 应用的名称，我们可以通过这个名称来启动应用
+      "app1", 
+      // 应用加载的方法
+      async () => {
+        return app1
+      },
+      // 实现匹配路径
+      location => location.pathname.startsWith("/app1")
+    )
+    registerApplication(
+      // 应用的名称，我们可以通过这个名称来启动应用
+      "app2",
+      // 应用加载的方法
+      async () => {
+        return app2
+      },
+      // 实现匹配路径
+      location => location.pathname.startsWith("/app2")  
+    )
+
+    // 最后启动基座应用
+    startApp()
+
+    /** 
+     * 实现的执行逻辑
+     * 当我们的应用实现匹配到路径的时候，就会执行应用的 bootstrap 方法
+     * 然后实现应用的 mount 方法
+     *    页面的实现的渲染逻辑就在此处实现定义即可，
+     *    直接使用原生API innerHTML innerText appendChild 等来实现即可
+     * 当我们的应用没有匹配到路径的时候，就会执行应用的 unmount 方法
+     *    这一步实现的是页面跳转的时候渲染页面的删除逻辑
+     *    直接使用原生API innerHTML innerText appendChild 等来实现即可，清空页面即可
+     */
+  </script>
+</body>
+</html>
