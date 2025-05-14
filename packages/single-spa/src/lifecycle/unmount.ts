@@ -1,5 +1,6 @@
 // settle appsToUnmount lifeCycle
 import { status } from "../shared"
+import type { RegisterationType } from "@/types/registerApplicationType"
 
 /**
  * unmount app lifecycle
@@ -14,7 +15,7 @@ import { status } from "../shared"
  *  unmount: Array|Function
  * }} app 
  */
-export function toUnmountPromise(app) {
+export function toUnmountPromise(app: Required<RegisterationType>) {
   return Promise.resolve().then(() => {
     if (app.status !== status["MOUNTED"]) return app
     

@@ -2,10 +2,11 @@
  * main func is to match the route and load the app --> bootstrap
  * registerApplication is to register the app and save the app state
  */
-import { status, isActive, shouldBeActive, reroute } from "../shared/index";
+import { status, reroute } from "@/shared/index";
+import type { RegisterationType } from "@/types/registerApplicationType";
 
 // define date protocols
-export const apps = []
+export const apps: Array<RegisterationType|Required<RegisterationType>> = []
 
 /**
  * single-spa registerApplication 
@@ -14,9 +15,14 @@ export const apps = []
  * @param {Function} activeWhen 
  * @param {Object|null|undefined} customProps 
  */
-function registerApplication(appName, loadApp, activeWhen, customProps) {
+function registerApplication(
+  appName: string, 
+  loadApp: () => Promise<any>, 
+  activeWhen: (location: string) => boolean, 
+  customProps?: any
+): void {
   // save state
-  const registeration = {
+  const registeration: RegisterationType = {
     name: appName,
     loadApp,
     activeWhen,

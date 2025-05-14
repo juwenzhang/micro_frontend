@@ -1,4 +1,5 @@
 import { status } from "../shared";
+import type { RegisterationType } from "@/types/registerApplicationType"
 
 /**
  * bootstrap app lifecycle
@@ -13,7 +14,7 @@ import { status } from "../shared";
  *  unmount: Array|Function
  * }} app 
  */
-export function toBootstrapPromise(app) {
+export function toBootstrapPromise(app: Required<RegisterationType>) {
   return Promise.resolve().then(() => {
     if (app.status !== status["NOT_BOOTSTRAPPED"]) return app
     app.status = status["BOOTSTRAPPING"]

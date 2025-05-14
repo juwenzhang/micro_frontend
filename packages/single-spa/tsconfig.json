@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "target": "es2016",
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "outDir": "./dist",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "baseUrl": "./",
+    "isolatedModules": true,
+    "resolvePackageJsonImports": false,
+    "paths": {
+      "@/*": ["src/*"]
+    },
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules", "dist"]
+}

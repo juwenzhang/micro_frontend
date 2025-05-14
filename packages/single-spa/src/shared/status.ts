@@ -1,7 +1,9 @@
 import { apps } from "../utils/app"
+import type { RegisterationType } from "@/types/registerApplicationType"
+import type { statusType } from "@/types/statusType"
 
 // define application's lifecycle status
-export const status = {
+export const status: statusType = {
   NOT_LOADED: "NOT_LOADED",
   LOADING_SOURCE_CODE: "LOADING_SOURCE_CODE",
   LOAD_ERROR: "LOAD_ERROR",
@@ -26,7 +28,7 @@ export const status = {
  *  status: String
  * }} app 
  */
-export function isActive(app) {
+export function isActive(app: RegisterationType) {
   return app.status === status["MOUNTED"]
 } 
 
@@ -40,17 +42,21 @@ export function isActive(app) {
  *  status: String
  * }} app 
  */
-export function shouldBeActive(app) {
-  return app.activeWhen(window.location)
+export function shouldBeActive(app: RegisterationType) {
+  return app.activeWhen(window.location.pathname)
 }
 
 /**
  * get all app status to ensure rerote method can category
  */
-export function getAppChanges() {
-  const appsToLoad = []  // app will load
-  const appsToMount = []  // app will mount
-  const appsToUnmount = []  // app will unmount
+export function getAppChanges(): {
+  appsToLoad: RegisterationType[],
+  appsToMount: Required<RegisterationType>[],
+  appsToUnmount: Required<RegisterationType>[]
+} {
+  const appsToLoad: RegisterationType[] = []  // app will load
+  const appsToMount: Required<RegisterationType>[] = []  // app will mount
+  const appsToUnmount: Required<RegisterationType>[] = []  // app will unmount
 
   // degin category
   apps.forEach(app => {
@@ -66,12 +72,12 @@ export function getAppChanges() {
       case status["BOOTSTRAPPING"]:
       case status["NOT_MOUNTED"]:
         if (appShouldBeActive) {
-          appsToMount.push(app)
+          appsToMount.push(app as Required<RegisterationType>)
         }     
         break
       case status["MOUNTED"]:
         if (!appShouldBeActive) {
-          appsToUnmount.push(app)
+          appsToUnmount.push(app as Required<RegisterationType>)
         }
         break
       default:

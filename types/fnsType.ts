@@ -1,0 +1,1 @@
+export type FnsType = Array<(...args: any[]) => Promise<any>>;

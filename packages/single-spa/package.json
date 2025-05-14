@@ -5,13 +5,18 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "dev": "npx http-server ./index.html -p 8080"
+    "build": "tsup src/index.ts",
+    "start": "http-server dist"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "packageManager": "pnpm@10.9.0",
   "devDependencies": {
-    "http-server": "^14.1.1"
+    "@types/node": "^22.15.18",
+    "cypress": "^14.3.3",
+    "http-server": "^14.1.1",
+    "tsup": "^8.4.0",
+    "typescript": "^5.8.3"
   }
 }

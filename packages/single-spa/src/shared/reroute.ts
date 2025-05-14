@@ -5,13 +5,14 @@ import { toBootstrapPromise } from "../lifecycle/bootstrap"
 import { toMountPromise } from "../lifecycle/mount"
 import { start_app_is_execed } from "../utils/start"
 import { callCaptureEventListeners } from "./intercept"
+import type { RegisterationType } from "@/types/registerApplicationType"
 
 /**
  * realise let app to load
  * @param {*} appsToLoad 
  * @returns 
  */
-export function LoadApps(appsToLoad) {
+export function LoadApps(appsToLoad: RegisterationType[]) {
   const loadAppPromises 
     = Promise.all(appsToLoad.map(app => toLoadPromise(app)))  // settle loadApp func
   return loadAppPromises.then(callEventListener)
@@ -28,7 +29,11 @@ export function LoadApps(appsToLoad) {
 /**
  * realise unmount unneed apps, start and mount need apps
  */
-export function performAppChange(appsToLoad, appsToMount, appsToUnmount) {
+export function performAppChange(
+  appsToLoad: RegisterationType[], 
+  appsToMount: Required<RegisterationType>[], 
+  appsToUnmount: Required<RegisterationType>[]
+) {
   const unMountAppPromises 
     = Promise.all(appsToUnmount.map(app => toUnmountPromise(app)))
 
@@ -40,18 +45,21 @@ export function performAppChange(appsToLoad, appsToMount, appsToUnmount) {
   const mountPromises = Promise.all(appsToMount.map(
     app => tryBootstrapAndMount(app, unMountAppPromises)))  
   
-  return Promise.all([loadPromises, mountPromises]).then(() => {
+  return Promise.all([loadPromises, mountPromises]).then((app) => {
     callEventListener()
   })
 }
 
-function callEventListener(_event) {
-  callCaptureEventListeners(_event)
+function callEventListener() {
+  callCaptureEventListeners(new Event("reroute"))
 }
 
-export function tryBootstrapAndMount(app, unMountAppPromises) {
+export function tryBootstrapAndMount(
+  app: Required<RegisterationType> | RegisterationType, 
+  unMountAppPromises: Promise<any>
+) {
   if (shouldBeActive(app)) {
-    return toBootstrapPromise(app)
+    return toBootstrapPromise(app as Required<RegisterationType>)
       .then(app => unMountAppPromises
         .then(() => toMountPromise(app)))
   }
@@ -60,7 +68,7 @@ export function tryBootstrapAndMount(app, unMountAppPromises) {
 /**
  * when register a new application, then methods must be exec
  */
-export function reroute(event) {
+export function reroute() {
   const { 
     appsToLoad, 
     appsToMount, 

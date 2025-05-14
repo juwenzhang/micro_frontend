@@ -1,5 +1,6 @@
 import { status } from "../shared"
 import { composeFunc } from "../utils/flattenArrayToAsync"
+import type { RegisterationType } from "@/types/registerApplicationType"
 
 // settle appsToLoad
 /**
@@ -12,7 +13,7 @@ import { composeFunc } from "../utils/flattenArrayToAsync"
  *  status: String
  * }} app 
  */
-export function toLoadPromise(app) {
+export function toLoadPromise(app: RegisterationType) {
   return Promise.resolve().then(() => {
     if (app.status !== status["NOT_LOADED"]) return app
 
